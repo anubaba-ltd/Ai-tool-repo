@@ -1,0 +1,82 @@
+<div class="row g-4 admin-layout">
+  <div class="col-lg-3"><%- include('../partials/admin-sidebar') %></div>
+  <div class="col-lg-9">
+    <div class="hero mb-4">
+      <span class="hero-kicker"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</span>
+      <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+        <div>
+          <h1 class="display-6 fw-black mb-2">Control center</h1>
+          <p class="mb-0 opacity-75">Manage users, tools, extension files, and usage activity from one clean panel.</p>
+        </div>
+        <a href="/admin/tools" class="btn btn-light px-4"><i class="fa-solid fa-plus me-2"></i>Add Tool</a>
+      </div>
+    </div>
+  
+    
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card stat-card p-4 h-100">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted fw-bold mb-2">Total Users</div>
+              <div class="stat-number fw-black"><%= users.length %></div>
+            </div>
+            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+          </div>
+          <div class="small text-muted mt-3">Registered portal accounts</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card stat-card p-4 h-100">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted fw-bold mb-2">Active Tools</div>
+              <div class="stat-number fw-black"><%= tools.filter(t=>t.active).length %></div>
+            </div>
+            <div class="stat-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+          </div>
+          <div class="small text-muted mt-3"><%= tools.length %> total tools configured</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card stat-card p-4 h-100">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="text-muted fw-bold mb-2">Recent Logs</div>
+              <div class="stat-number fw-black"><%= logs.length %>+</div>
+            </div>
+            <div class="stat-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          </div>
+          <div class="small text-muted mt-3">Latest activity records</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card p-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+        <div>
+          <span class="kicker mb-2"><i class="fa-solid fa-bolt"></i> Live activity</span>
+          <h4 class="fw-black mb-0">Recent Activity</h4>
+        </div>
+        <a href="/admin/logs" class="btn btn-outline-primary btn-sm px-3">View all logs</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Action</th><th>Time</th></tr></thead>
+          <tbody>
+          <% logs.forEach(l=>{ %>
+            <tr>
+              <td><span class="badge badge-dark-soft"><i class="fa-solid fa-circle-dot me-1"></i><%= l.action %></span></td>
+              <td class="text-muted"><%= new Date(l.createdAt).toLocaleString() %></td>
+            </tr>
+          <% }) %>
+          <% if (!logs.length) { %>
+            <tr><td colspan="2" class="text-center text-muted py-5">No activity yet.</td></tr>
+          <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

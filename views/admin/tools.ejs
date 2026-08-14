@@ -1,0 +1,67 @@
+<div class="row g-4 admin-layout">
+  <div class="col-lg-3"><%- include('../partials/admin-sidebar') %></div>
+  <div class="col-lg-9">
+    <div class="page-toolbar">
+      <div>
+        <span class="kicker"><i class="fa-solid fa-screwdriver-wrench"></i> Tool library</span>
+        <h2 class="page-title fw-black mb-1">Tools</h2>
+        <p class="text-muted mb-0">Create, edit, and control all user-facing tool cards.</p>
+      </div>
+      <button class="btn btn-primary px-4" data-bs-toggle="modal" data-bs-target="#addTool"><i class="fa-solid fa-plus me-2"></i>Add Tool</button>
+    </div>
+
+    <div class="row g-3">
+      <% tools.forEach((t, index)=>{ %>
+      <div class="col-xl-6">
+        <div class="card tool-card p-4 h-100 hover-lift">
+          <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="icon-bubble"><i class="fa-solid fa-toolbox"></i></div>
+              <div>
+                <h4 class="card-title fw-black mb-1"><%= t.name %></h4>
+                <span class="badge <%= t.active ? 'badge-success-soft' : 'badge-danger-soft' %>"><%= t.active ? 'Active' : 'Disabled' %></span>
+              </div>
+            </div>
+            <span class="badge badge-soft">Expires <%= t.expiryHours %>h</span>
+          </div>
+          <p class="text-muted"><%= t.description || 'No description added yet.' %></p>
+          <div class="meta-line mb-3">
+            <span class="meta-pill"><i class="fa-solid fa-link"></i><%= t.url %></span>
+            <span class="meta-pill"><i class="fa-solid fa-file-zipper"></i><%= t.extensionFile || 'No extension' %></span>
+          </div>
+          <div class="d-flex flex-wrap gap-2 mt-auto">
+            <button class="btn btn-outline-primary btn-sm px-3" data-bs-toggle="modal" data-bs-target="#editTool<%= t.id %>"><i class="fa-solid fa-pen me-1"></i>Edit</button>
+            <form method="post" action="/admin/tools/<%= t.id %>/delete" class="d-inline" onsubmit="return confirm('Delete tool?')">
+              <button class="btn btn-outline-danger btn-sm px-3"><i class="fa-solid fa-trash me-1"></i>Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="editTool<%= t.id %>" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <form class="modal-content" method="post" enctype="multipart/form-data" action="/admin/tools/<%= t.id %>/update">
+            <%- include('tool-form', {tool:t, heading:'Edit Tool'}) %>
+          </form>
+        </div>
+      </div>
+      <% }) %>
+      <% if (!tools.length) { %>
+      <div class="col-12">
+        <div class="card empty-state">
+          <i class="fa-solid fa-toolbox"></i>
+          <h4 class="fw-black">No tools configured</h4>
+          <p class="text-muted">Click Add Tool to create your first tool card.</p>
+          <div><button class="btn btn-primary px-4" data-bs-toggle="modal" data-bs-target="#addTool">Add Tool</button></div>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="addTool" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <form class="modal-content" method="post" enctype="multipart/form-data" action="/admin/tools">
+      <%- include('tool-form', {tool:null, heading:'Add Tool'}) %>
+    </form>
+  </div>
+</div>

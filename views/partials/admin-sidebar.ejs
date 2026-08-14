@@ -1,0 +1,21 @@
+<div class="admin-sidebar">
+  <div class="card p-3">
+    <div class="sidebar-brand">
+      <div class="d-flex align-items-center gap-3">
+        <div class="icon-bubble"><i class="fa-solid fa-user-shield"></i></div>
+        <div>
+          <div class="fw-black"><%= currentUser.role === 'editor' ? 'Editor Panel' : 'Admin Panel' %></div>
+          <div class="small text-muted"><%= currentUser.role === 'editor' ? 'Manage tools' : 'Manage access safely' %></div>
+        </div>
+      </div>
+    </div>
+    <% if (currentUser.role === 'admin') { %>
+    <a class="sidebar-link" href="/admin"><i class="fa-solid fa-chart-line"></i><span>Dashboard</span></a>
+    <a class="sidebar-link" href="/admin/users"><i class="fa-solid fa-users"></i><span>Users</span></a>
+    <% } %>
+    <a class="sidebar-link" href="/admin/tools"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></a>
+    <% if (currentUser.role === 'admin') { %>
+    <a class="sidebar-link" href="/admin/logs"><i class="fa-solid fa-clock-rotate-left"></i><span>Logs</span></a>
+    <% } %>
+  </div>
+</div>

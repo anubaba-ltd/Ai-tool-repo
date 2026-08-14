@@ -1,0 +1,15 @@
+body { background: #f5f7fb; }
+.hero { background: linear-gradient(135deg, #111827, #3b82f6); color: white; border-radius: 24px; padding: 32px; }
+.card { border: 0; border-radius: 18px; box-shadow: 0 8px 28px rgba(15, 23, 42, .08); }
+.btn { border-radius: 10px; }
+.form-control, .form-select { border-radius: 12px; }
+.sidebar-link { text-decoration: none; display: block; padding: 12px 14px; border-radius: 12px; color: #334155; font-weight: 600; }
+.sidebar-link:hover { background: #e8f0ff; color: #0d6efd; }
+.tool-card { transition: .2s ease; }
+.tool-card:hover { transform: translateY(-3px); }
+.badge-soft { background:#e8f0ff; color:#0d6efd; }
+.copy-box { background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:14px; white-space:pre-wrap; }
+.icon-bubble { width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; background:#e8f0ff; color:#0d6efd; font-size:22px; }
+.extension-card { background: linear-gradient(180deg, #ffffff, #f8fbff); }
+.install-steps { padding-left: 1.25rem; color:#475569; }
+.install-steps li { margin-bottom: .45rem; }

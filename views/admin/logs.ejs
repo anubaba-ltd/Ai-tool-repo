@@ -1,0 +1,35 @@
+<div class="row g-4 admin-layout">
+  <div class="col-lg-3"><%- include('../partials/admin-sidebar') %></div>
+  <div class="col-lg-9">
+    <div class="page-toolbar">
+      <div>
+        <span class="kicker"><i class="fa-solid fa-clock-rotate-left"></i> Audit trail</span>
+        <h2 class="page-title fw-black mb-1">Usage Logs</h2>
+        <p class="text-muted mb-0">Track user logins, tool opens, and admin changes.</p>
+      </div>
+      <div class="search-lite">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input class="form-control" placeholder="Search logs..." data-table-search="#logsTable">
+      </div>
+    </div>
+
+    <div class="card p-4 table-responsive">
+      <table class="table align-middle" id="logsTable">
+        <thead><tr><th>Action</th><th>User</th><th>Details</th><th>Time</th></tr></thead>
+        <tbody>
+        <% logs.forEach(l=>{ const u=users.find(x=>x.id===l.userId); %>
+          <tr>
+            <td><span class="badge badge-dark-soft"><%= l.action %></span></td>
+            <td><%= u?u.email:'Unknown' %></td>
+            <td><pre class="small m-0"><%= JSON.stringify(l.meta || {}, null, 2) %></pre></td>
+            <td class="text-muted"><%= new Date(l.createdAt).toLocaleString() %></td>
+          </tr>
+        <% }) %>
+        <% if (!logs.length) { %>
+          <tr><td colspan="4"><div class="empty-state"><i class="fa-solid fa-clock"></i><h4 class="fw-black">No logs yet</h4><p class="text-muted mb-0">Activity will appear here after users start using the portal.</p></div></td></tr>
+        <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

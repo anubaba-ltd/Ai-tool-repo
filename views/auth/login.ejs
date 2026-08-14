@@ -1,0 +1,50 @@
+<div class="login-wrap">
+  <div class="container">
+    <div class="card login-card border-0 shadow-lg">
+      <div class="row g-0 align-items-stretch">
+        <div class="col-lg-6 login-panel login-visual d-flex flex-column justify-content-between">
+          <div class="position-relative" style="z-index:1">
+            <span class="hero-kicker"><i class="fa-solid fa-lock"></i> Secure Access Portal</span>
+            <h1 class="display-5 fw-black mb-3">Manage tools with a cleaner, safer workflow.</h1>
+            <p class="lead opacity-75 mb-4">User access, browser extension downloads, expiry controls, and audit logs in one professional dashboard.</p>
+            <div class="d-grid gap-3">
+              <div class="feature-pill"><i class="fa-solid fa-shield-halved"></i><span>Single-session security</span></div>
+              <div class="feature-pill"><i class="fa-solid fa-puzzle-piece"></i><span>Managed extension downloads</span></div>
+              <div class="feature-pill"><i class="fa-solid fa-clock-rotate-left"></i><span>Usage tracking and logs</span></div>
+            </div>
+          </div>
+          <div class="position-relative small opacity-75 mt-4" style="z-index:1">
+            <i class="fa-solid fa-star me-2"></i>Fast, modern, and admin-friendly interface
+          </div>
+        </div>
+        <div class="col-lg-6 login-panel bg-white d-flex align-items-center">
+          <div class="w-100 mx-auto" style="max-width: 440px;">
+            <div class="mb-4">
+              <span class="kicker"><i class="fa-solid fa-key"></i> Welcome back</span>
+              <h2 class="fw-black mb-2">Login to your account</h2>
+              <p class="text-muted mb-0">Enter your credentials to continue to the portal.</p>
+            </div>
+            <form method="post" action="/login">
+              <label class="form-label">Email address</label>
+              <div class="position-relative mb-3">
+                <i class="fa-solid fa-envelope position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
+                <input name="email" type="email" class="form-control ps-5" placeholder="you@example.com" required>
+              </div>
+              <label class="form-label">Password</label>
+              <div class="position-relative mb-4">
+                <i class="fa-solid fa-lock position-absolute text-muted" style="left: 15px; top: 50%; transform: translateY(-50%);"></i>
+                <input name="password" type="password" class="form-control ps-5" placeholder="Enter password" required>
+              </div>
+              <button class="btn btn-primary w-100 py-3"><i class="fa-solid fa-right-to-bracket me-2"></i>Login</button>
+            </form>
+            <!-- <div class="small text-muted mt-4 p-3 rounded-4" style="background:#f8fafc; border:1px solid rgba(148,163,184,.22)">
+              <strong>Demo credentials</strong><br>
+              Admin: admin@example.com / ChangeMe123!<br>
+              User: user@example.com / User123!
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

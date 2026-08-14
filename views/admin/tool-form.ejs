@@ -1,0 +1,53 @@
+<div class="modal-header border-0 pb-0">
+  <div>
+    <span class="kicker"><i class="fa-solid fa-pen-to-square"></i> Tool setup</span>
+    <h5 class="fw-black mb-0"><%= heading %></h5>
+  </div>
+  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body pt-3">
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label">Tool Name</label>
+      <input name="name" class="form-control" value="<%= tool?tool.name:'' %>" placeholder="Google Flow" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Tool URL</label>
+      <input name="url" class="form-control" value="<%= tool?tool.url:'' %>" placeholder="https://..." required>
+    </div>
+    <div class="col-12">
+      <label class="form-label">Description</label>
+      <textarea name="description" class="form-control" rows="2" placeholder="Short user-facing description"><%= tool?tool.description:'' %></textarea>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Instructions</label>
+      <textarea name="instructions" class="form-control" rows="4" placeholder="Steps users should follow"><%= tool?tool.instructions:'' %></textarea>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Access Notes</label>
+      <textarea name="accessNotes" class="form-control" rows="4" placeholder="Login notes / access policy"><%= tool?tool.accessNotes:'' %></textarea>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Expiry Hours</label>
+      <select name="expiryHours" class="form-select">
+        <% [2,4,6,12,24].forEach(h=>{ %>
+          <option value="<%= h %>" <%= tool&&Number(tool.expiryHours)===h?'selected':'' %>><%= h %> hours</option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Extension ZIP/CRX</label>
+      <input name="extension" type="file" class="form-control">
+      <% if (tool && tool.extensionFile) { %><div class="small text-muted mt-2">Current: <%= tool.extensionFile %></div><% } %>
+    </div>
+    <div class="col-12">
+      <label class="d-inline-flex align-items-center gap-2 fw-bold text-muted">
+        <input type="checkbox" name="active" class="form-check-input m-0" <%= !tool || tool.active ? 'checked':'' %>> Active tool
+      </label>
+    </div>
+  </div>
+</div>
+<div class="modal-footer border-0 pt-0">
+  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+  <button class="btn btn-primary px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Save Tool</button>
+</div>

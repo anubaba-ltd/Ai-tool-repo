@@ -1,0 +1,101 @@
+<div class="row g-4 admin-layout">
+  <div class="col-lg-3"><%- include('../partials/admin-sidebar') %></div>
+  <div class="col-lg-9">
+    <div class="page-toolbar">
+      <div>
+        <span class="kicker"><i class="fa-solid fa-users"></i> People</span>
+        <h2 class="page-title fw-black mb-1">Users</h2>
+        <p class="text-muted mb-0">Manage portal accounts, roles, and access status.</p>
+      </div>
+      <div class="d-flex flex-wrap gap-2 align-items-center">
+        <div class="search-lite">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input class="form-control" placeholder="Search users..." data-table-search="#usersTable">
+        </div>
+        <button class="btn btn-primary px-4" data-bs-toggle="modal" data-bs-target="#addUser"><i class="fa-solid fa-user-plus me-2"></i>Add User</button>
+      </div>
+    </div>
+
+    <div class="card p-4 table-responsive">
+      <table class="table align-middle" id="usersTable">
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th width="260">Actions</th></tr></thead>
+        <tbody>
+        <% users.forEach(u=>{ %>
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <span class="avatar-dot"><%= (u.name || 'U').charAt(0).toUpperCase() %></span>
+                <strong><%= u.name %></strong>
+              </div>
+            </td>
+            <td class="text-muted"><%= u.email %></td>
+            <td><span class="badge badge-dark-soft"><%= u.role %></span></td>
+            <td><span class="badge <%= u.active ? 'badge-success-soft' : 'badge-danger-soft' %>"><%= u.active ? 'Active' : 'Disabled' %></span></td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary px-3" data-bs-toggle="modal" data-bs-target="#edit<%= u.id %>"><i class="fa-solid fa-pen me-1"></i>Edit</button>
+              <form method="post" action="/admin/users/<%= u.id %>/delete" class="d-inline" onsubmit="return confirm('Delete user?')">
+                <button class="btn btn-sm btn-outline-danger px-3"><i class="fa-solid fa-trash me-1"></i>Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+        <% if (!users.length) { %>
+          <tr><td colspan="5"><div class="empty-state"><i class="fa-solid fa-users"></i><h4 class="fw-black">No users found</h4><p class="text-muted mb-0">Create your first portal user.</p></div></td></tr>
+        <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<% users.forEach(u=>{ %>
+<div class="modal fade" id="edit<%= u.id %>" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" method="post" action="/admin/users/<%= u.id %>/update">
+      <div class="modal-header border-0 pb-0">
+        <div><span class="kicker"><i class="fa-solid fa-user-pen"></i> Edit account</span><h5 class="fw-black mb-0">Edit User</h5></div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Name</label>
+        <input name="name" class="form-control mb-3" value="<%= u.name %>" required>
+        <label class="form-label">Email</label>
+        <input name="email" type="email" class="form-control mb-3" value="<%= u.email %>" required>
+        <label class="form-label">New password</label>
+        <input name="password" class="form-control mb-3" placeholder="Leave blank to keep current password">
+        <label class="form-label">Role</label>
+        <select name="role" class="form-select mb-3">
+          <option <%= u.role==='user'?'selected':'' %> value="user">User</option>
+          <option <%= u.role==='editor'?'selected':'' %> value="editor">Editor</option>
+          <option <%= u.role==='admin'?'selected':'' %> value="admin">Admin</option>
+        </select>
+        <label class="d-inline-flex align-items-center gap-2 fw-bold text-muted"><input type="checkbox" name="active" class="form-check-input m-0" <%= u.active?'checked':'' %>> Active account</label>
+      </div>
+      <div class="modal-footer border-0 pt-0"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary px-4">Save User</button></div>
+    </form>
+  </div>
+</div>
+<% }) %>
+
+<div class="modal fade" id="addUser" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" method="post" action="/admin/users">
+      <div class="modal-header border-0 pb-0">
+        <div><span class="kicker"><i class="fa-solid fa-user-plus"></i> New account</span><h5 class="fw-black mb-0">Add User</h5></div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label class="form-label">Name</label>
+        <input name="name" class="form-control mb-3" placeholder="Full name" required>
+        <label class="form-label">Email</label>
+        <input name="email" type="email" class="form-control mb-3" placeholder="user@example.com" required>
+        <label class="form-label">Password</label>
+        <input name="password" class="form-control mb-3" placeholder="Temporary password" required>
+        <label class="form-label">Role</label>
+        <select name="role" class="form-select mb-3"><option value="user">User</option><option value="editor">Editor</option><option value="admin">Admin</option></select>
+        <label class="d-inline-flex align-items-center gap-2 fw-bold text-muted"><input type="checkbox" name="active" class="form-check-input m-0" checked> Active account</label>
+      </div>
+      <div class="modal-footer border-0 pt-0"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button class="btn btn-primary px-4">Create User</button></div>
+    </form>
+  </div>
+</div>
