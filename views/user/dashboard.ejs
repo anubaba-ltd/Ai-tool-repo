@@ -6,7 +6,7 @@
       <p class="mb-0 opacity-75">Download the approved extension, then open your assigned tools securely.</p>
     </div>
     <div class="d-flex gap-2 flex-wrap">
-      <span class="feature-pill"><i class="fa-solid fa-shield-halved"></i> Secure access</span>
+      <span class="feature-pill" id="extensionSecurityStatus"><i class="fa-solid fa-shield-halved"></i> Checking extension...</span>
     </div>
   </div>
 </div>
@@ -72,7 +72,7 @@
         <% if (t.extensionFile) { %>
           <a class="btn btn-outline-dark" href="/uploads/<%= t.extensionFile %>" download><i class="fa-solid fa-file-arrow-down me-2"></i>Download Tool Extension</a>
         <% } %>
-        <a class="btn btn-primary" href="<%= t.url %>" target="_blank" onclick="trackTool('<%= t.id %>')"><i class="fa-solid fa-arrow-up-right-from-square me-2"></i>Open Tool</a>
+        <a class="btn btn-primary<%= (t.url || '').includes('labs.google') ? ' secure-tool-launch' : '' %>" href="<%= t.url %>" target="_blank" data-tool-id="<%= t.id %>" data-secure-tool="<%= (t.url || '').includes('labs.google') ? '1' : '0' %>"><i class="fa-solid fa-arrow-up-right-from-square me-2"></i>Open Tool</a>
       </div>
       <hr class="my-4">
       <div class="meta-line">

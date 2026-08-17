@@ -1,0 +1,16 @@
+AIANUBABA SECURE EXTENSION AUTH - DEPLOY STEPS
+
+1. Keep this GitHub repository PRIVATE. The downloadable extension may contain sensitive tool-session material.
+2. Put the CONTENTS of this folder at the ROOT of your GitHub repository. package.json and server.js must be visible at repository root.
+3. In Hostinger Deployments, Root directory = /, Package manager = npm, Entry file = server.js.
+4. Environment variables: keep your existing MYSQL_* values, PORT, APP_NAME and SESSION_SECRET. Add EXTENSION_SESSION_HOURS=2 and NODE_ENV=production.
+5. Deploy/redeploy. The server automatically creates/migrates extension_sessions.
+6. Install public/downloads/aianubaba-ai-tools-secure-extension.zip as an unpacked Chrome extension.
+7. Login to https://aianubaba.co.uk. On /dashboard the extension is automatically linked to that portal session.
+8. The browser/extension heartbeats the server every 5 seconds. Refresh/focus also triggers an immediate heartbeat.
+9. A second portal login for the same user replaces the first portal + extension session.
+10. Removing the extension uses Chrome's uninstall callback URL to revoke the server session. Disabling it is detected by the portal heartbeat/page-load check.
+
+IMPORTANT BROWSER LIMIT: after an extension is already disabled/removed, Chrome does not allow that disabled code to execute. Therefore no extension can guarantee that it will run cleanup code at the exact disable instant on a third-party page. This build closes the practical gap with server sessions, 5-second checks, page-load/refresh checks, and an uninstall URL.
+
+SECURITY: rotate any MySQL password or third-party cookies that were previously committed to GitHub.

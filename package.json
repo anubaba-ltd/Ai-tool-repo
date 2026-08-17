@@ -1,7 +1,7 @@
 {
   "name": "safe-tool-portal",
   "version": "1.0.0",
-  "description": "Production-ready admin/user tool access portal with extension downloads and usage tracking.",
+  "description": "AIANUBABA secure tool portal with one-device extension authentication and heartbeat enforcement.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -22,5 +22,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
