@@ -96,6 +96,24 @@ async function initDatabase() {
   await ignoreDuplicateColumn('ALTER TABLE extension_sessions ADD COLUMN uninstall_token_hash VARCHAR(255) NULL AFTER session_token_hash');
   await ignoreDuplicateColumn('ALTER TABLE extension_sessions ADD COLUMN portal_session_id VARCHAR(100) NULL AFTER uninstall_token_hash');
 
+  // One-time login handoffs used by the AIANUBABA extension.
+  // Only a SHA-256 hash is stored; the real token is returned once and expires quickly.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS extension_handoffs (
+      id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+      user_id VARCHAR(36) NOT NULL,
+      token_hash CHAR(64) NOT NULL,
+      target_path VARCHAR(255) NOT NULL DEFAULT '/dashboard',
+      expires_at DATETIME NOT NULL,
+      used TINYINT(1) NOT NULL DEFAULT 0,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      UNIQUE KEY uq_extension_handoff_token (token_hash),
+      KEY idx_extension_handoff_user (user_id),
+      KEY idx_extension_handoff_expiry (expires_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+
   await pool.query(`CREATE TABLE IF NOT EXISTS tools (
     id VARCHAR(36) PRIMARY KEY,
     name VARCHAR(160) NOT NULL,
@@ -324,8 +342,122 @@ app.get('/api/extension/uninstalled', asyncHandler(async (req, res) => {
   res.redirect('/login?extension=removed');
 }));
 
+// Safe one-time handoff consumer.
+// The extension opens this URL. The server validates the one-time token and
+// creates a FRESH Express session for this AIANUBABA website.
+app.get('/api/extension/consume', asyncHandler(async (req, res) => {
+  const rawToken = String(req.query.token || '').trim();
+  if (!rawToken) return res.status(400).send('Missing handoff token');
+
+  const tokenHash = hashToken(rawToken);
+  const [rows] = await pool.query(`
+    SELECT id, user_id, target_path
+    FROM extension_handoffs
+    WHERE token_hash = ?
+      AND used = 0
+      AND expires_at > NOW()
+    LIMIT 1
+  `, [tokenHash]);
+
+  const handoff = rows[0];
+  if (!handoff) return res.status(401).send('Handoff expired or already used');
+
+  // Mark the token used atomically so it cannot be replayed.
+  const [usedResult] = await pool.query(`
+    UPDATE extension_handoffs
+    SET used = 1
+    WHERE id = ? AND used = 0 AND expires_at > NOW()
+  `, [handoff.id]);
+
+  if (!usedResult.affectedRows) {
+    return res.status(401).send('Handoff expired or already used');
+  }
+
+  const [userRows] = await pool.query(`
+    SELECT id, name, email, role, active
+    FROM users
+    WHERE id = ?
+    LIMIT 1
+  `, [handoff.user_id]);
+
+  const user = userRows[0];
+  if (!user || !user.active) return res.status(401).send('User is not active');
+
+  await new Promise((resolve, reject) => {
+    req.session.regenerate(err => err ? reject(err) : resolve());
+  });
+
+  const loginToken = uuid();
+  req.session.loginToken = loginToken;
+  req.session.user = {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role
+  };
+
+  // Keep the existing extension activation tied to the newly created portal session.
+  await pool.query('UPDATE users SET current_session_id = ? WHERE id = ?', [loginToken, user.id]);
+  await pool.query(`
+    UPDATE extension_sessions
+    SET portal_session_id = ?
+    WHERE user_id = ? AND active = 1
+  `, [loginToken, user.id]);
+
+  await audit(user.id, 'extension_handoff_login', { handoffId: handoff.id });
+
+  await new Promise((resolve, reject) => {
+    req.session.save(err => err ? reject(err) : resolve());
+  });
+
+  res.redirect(handoff.target_path || '/dashboard');
+}));
+
 // All website routes below this point verify the one-browser portal session.
 app.use(validateSingleSession);
+
+// Logged-in AIANUBABA user requests a one-time handoff URL.
+// The raw token lasts 60 seconds and is never stored in plaintext in MySQL.
+app.post('/api/extension/handoff', requireLogin, requireUser, asyncHandler(async (req, res) => {
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  const tokenHash = hashToken(rawToken);
+
+  // For safety, only allow a local path on this website, never an external URL.
+  const requestedPath = String(req.body?.targetPath || '/dashboard').trim();
+  const targetPath = requestedPath.startsWith('/') && !requestedPath.startsWith('//')
+    ? requestedPath
+    : '/dashboard';
+
+  const expiresAt = new Date(Date.now() + 60 * 1000);
+
+  // Small cleanup so old one-time tokens do not pile up forever.
+  await pool.query('DELETE FROM extension_handoffs WHERE used = 1 OR expires_at <= NOW()');
+
+  await pool.query(`
+    INSERT INTO extension_handoffs (user_id, token_hash, target_path, expires_at, used)
+    VALUES (?, ?, ?, ?, 0)
+  `, [req.session.user.id, tokenHash, targetPath, expiresAt]);
+
+  // Only generate handoff URLs for the domains you control.
+  const allowedHosts = new Set([
+    'aianubaba.co.uk',
+    'www.aianubaba.co.uk',
+    'lavender-monkey-673604.hostingersite.com'
+  ]);
+
+  const hostname = String(req.hostname || '').toLowerCase();
+  if (!allowedHosts.has(hostname)) {
+    return res.status(400).json({ ok: false, error: 'This host is not allowed for extension handoff.' });
+  }
+
+  const origin = `${req.protocol}://${hostname}`;
+
+  res.json({
+    ok: true,
+    expiresInSeconds: 60,
+    handoffUrl: `${origin}/api/extension/consume?token=${encodeURIComponent(rawToken)}`
+  });
+}));
 
 app.get('/api/extension/bootstrap', requireLogin, requireUser, (req, res) => {
   const payload = { uid: req.session.user.id, sid: req.session.loginToken, exp: Date.now() + EXTENSION_ACTIVATION_TTL_SECONDS * 1000, nonce: crypto.randomBytes(12).toString('hex') };
