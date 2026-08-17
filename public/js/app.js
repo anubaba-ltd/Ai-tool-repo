@@ -91,6 +91,48 @@ const ExtensionSecurity = (() => {
     } catch (_) { await forcedLogout('extension_launch_no_response'); return false; }
   }
 
+  // NEW: request a one-time login handoff from your own website,
+  // then ask the extension to open it.
+  async function accessHandoff(targetPath='/dashboard') {
+    const ok = await heartbeat('before-handoff', true);
+    if (!ok) return false;
+
+    let handoff;
+    try {
+      const response = await fetch('/api/extension/handoff', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetPath })
+      });
+
+      handoff = await response.json();
+      if (!response.ok || !handoff?.ok || !handoff?.handoffUrl) {
+        throw new Error(handoff?.error || 'Could not create access token');
+      }
+    } catch (err) {
+      showToast(err.message || 'Could not create access token');
+      return false;
+    }
+
+    try {
+      const result = await request('ACCESS_TOOL_HANDOFF', {
+        handoffUrl: handoff.handoffUrl
+      }, 5000);
+
+      if (!result?.ok) {
+        showToast(result?.code || 'Extension could not open access link');
+        return false;
+      }
+
+      showToast('Secure access opened');
+      return true;
+    } catch (_) {
+      showToast('Extension did not respond to secure access request');
+      return false;
+    }
+  }
+
   async function init() {
     if (window.location.pathname !== '/dashboard') return;
     await activate();
@@ -104,7 +146,7 @@ const ExtensionSecurity = (() => {
       if (d.source === REPLY_SOURCE && d.type === 'AUTH_EVENT' && d.payload && !d.payload.ok && !d.payload.transient) forcedLogout(d.payload.code || 'extension_auth_event');
     });
   }
-  return { init, heartbeat, launch };
+  return { init, heartbeat, launch, accessHandoff };
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -121,5 +163,22 @@ document.addEventListener('DOMContentLoaded', () => {
       finally { link.classList.remove('disabled'); link.removeAttribute('aria-disabled'); }
     });
   });
+
+  // NEW: test button for the safe one-time handoff system.
+  const accessButton = document.getElementById('aiabAccessTool');
+  if (accessButton) {
+    accessButton.addEventListener('click', async () => {
+      accessButton.disabled = true;
+      const oldHtml = accessButton.innerHTML;
+      accessButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Opening...';
+      try {
+        await ExtensionSecurity.accessHandoff(accessButton.dataset.targetPath || '/dashboard');
+      } finally {
+        accessButton.disabled = false;
+        accessButton.innerHTML = oldHtml;
+      }
+    });
+  }
+
   ExtensionSecurity.init();
 });
