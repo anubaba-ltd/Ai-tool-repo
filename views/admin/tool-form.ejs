@@ -12,8 +12,11 @@
       <input name="name" class="form-control" value="<%= tool?tool.name:'' %>" placeholder="Google Flow" required>
     </div>
     <div class="col-md-6">
-      <label class="form-label">Tool URL</label>
-      <input name="url" class="form-control" value="<%= tool?tool.url:'' %>" placeholder="https://..." required>
+<label class="form-label">
+  <i class="fa-solid fa-link me-1 text-primary"></i>
+  Target Website Link
+</label>     
+<input name="url" class="form-control" value="<%= tool?tool.url:'' %>" placeholder="https://..." required>
     </div>
     <div class="col-12">
       <label class="form-label">Description</label>
