@@ -1,93 +1,249 @@
 <div class="hero mb-4">
-  <span class="hero-kicker"><i class="fa-solid fa-house-laptop"></i> User Portal</span>
+  <span class="hero-kicker">
+    <i class="fa-solid fa-house-laptop"></i> User Portal
+  </span>
+
   <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
     <div>
-      <h1 class="display-6 fw-black mb-2">Welcome, <%= currentUser.name %></h1>
-      <p class="mb-0 opacity-75">Download the approved extension, then open your assigned tools securely.</p>
-    </div>
-    <div class="d-flex gap-2 flex-wrap">
-      <span class="feature-pill" id="extensionSecurityStatus"><i class="fa-solid fa-shield-halved"></i> Checking extension...</span>
+      <h1 class="display-6 fw-black mb-2">
+        Welcome, <%= currentUser.name %>
+      </h1>
+
+      <p class="mb-0 opacity-75">
+        Download the approved extension, then open your assigned tools securely.
+      </p>
     </div>
   </div>
 </div>
 
-<!-- <div class="card p-4 p-lg-5 mb-4 extension-card">
-  <div class="row align-items-center g-4">
-    <div class="col-lg-8">
-      <div class="d-flex align-items-center gap-3 mb-4">
-        <div class="icon-bubble"><i class="fa-solid fa-puzzle-piece"></i></div>
-        <div>
-          <span class="kicker mb-2"><i class="fa-solid fa-download"></i> Required setup</span>
-          <h4 class="fw-black mb-1">Install Browser Extension</h4>
-          <p class="text-muted mb-0">Install the extension in Chrome/Edge before using your assigned tools.</p>
-        </div>
-      </div>
-      <ol class="install-steps mb-0">
-        <li>Click <strong>Download Extension</strong> and extract the ZIP file on your computer.</li>
-        <li>Open Chrome and go to <strong>chrome://extensions</strong>.</li>
-        <li>Turn on <strong>Developer mode</strong> from the top-right corner.</li>
-        <li>Click <strong>Load unpacked</strong> and select the extracted extension folder.</li>
-        <li>Return here and open your assigned tool cards.</li>
-      </ol>
-    </div>
-    <div class="col-lg-4">
-      <div class="card p-3 border-0 bg-white h-100">
-        <a class="btn btn-primary btn-lg w-100 py-3 mb-3" href="/downloads/abl-pro-ai-tools-extension.zip" download>
-          <i class="fa-solid fa-download me-2"></i>Download Extension
-        </a>
-        <div class="d-flex align-items-center gap-2 text-muted small">
-          <i class="fa-solid fa-circle-check text-success"></i>
-          <span>Managed by admin and required for access.</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div> -->
 
 <div class="page-toolbar">
   <div>
-    <!-- <span class="kicker"><i class="fa-solid fa-table-cells-large"></i> Assigned access</span> -->
     <h2 class="page-title fw-black mb-1">Your Tools</h2>
-    <p class="text-muted mb-0"><%= tools.length %> tool<%= tools.length===1?'':'s' %> available for your account.</p>
+
+    <p class="text-muted mb-0">
+      <%= tools.length %> tool<%= tools.length===1?'':'s' %> available for your account.
+    </p>
   </div>
 </div>
 
+
 <div class="row g-4">
-  <% tools.forEach((t,i)=>{ %>
+
+  <!-- EXTENSION STATUS CARD -->
   <div class="col-xl-4 col-md-6">
-    <div class="card tool-card p-4 h-100">
+    <div class="card extension-card p-4 h-100">
+
       <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+
         <div class="d-flex align-items-center gap-3">
-          <div class="icon-bubble"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
-          <div>
-            <h4 class="card-title fw-black mb-1"><%= t.name %></h4>
-            <span class="badge badge-soft"><i class="fa-regular fa-clock me-1"></i><%= t.expiryHours %>h expiry</span>
+
+          <div class="icon-bubble">
+            <i class="fa-solid fa-puzzle-piece"></i>
           </div>
+
+          <div>
+            <h4 class="card-title fw-black mb-1">
+              AIANUBABA Extension
+            </h4>
+
+            <span class="badge badge-soft">
+              <i class="fa-brands fa-chrome me-1"></i>
+              Browser Extension
+            </span>
+          </div>
+
         </div>
+
       </div>
-      <p class="text-muted"><%= t.description || 'No description added yet.' %></p>
-      <div class="copy-box small d-none" id="inst<%= i %>"><%= t.instructions || t.accessNotes || '' %></div>
-      <div class="d-grid gap-2 mt-auto">
-        <button class="btn btn-outline-secondary" type="button" onclick="copyText('inst<%= i %>')"><i class="fa-solid fa-copy me-2"></i>Copy Access Text</button>
-        <% if (t.extensionFile) { %>
-          <a class="btn btn-outline-dark" href="/uploads/<%= t.extensionFile %>" download><i class="fa-solid fa-file-arrow-down me-2"></i>Download Tool Extension</a>
-        <% } %>
-        <a class="btn btn-primary<%= (t.url || '').includes('labs.google') ? ' secure-tool-launch' : '' %>" href="<%= t.url %>" target="_blank" data-tool-id="<%= t.id %>" data-secure-tool="<%= (t.url || '').includes('labs.google') ? '1' : '0' %>"><i class="fa-solid fa-arrow-up-right-from-square me-2"></i>Open Tool</a>
+
+
+      <p class="text-muted mb-3">
+        Your browser extension connection status.
+      </p>
+
+
+      <div class="p-3 rounded-4 border bg-light mb-3">
+
+        <div class="d-flex align-items-center gap-3">
+
+          <div
+            class="d-flex align-items-center justify-content-center rounded-circle bg-white shadow-sm"
+            style="width:48px;height:48px;min-width:48px;"
+          >
+            <i class="fa-solid fa-shield-halved text-primary"></i>
+          </div>
+
+          <div>
+
+            <div class="small text-muted mb-1">
+              Extension Status
+            </div>
+
+            <div
+              id="extensionSecurityStatus"
+              class="fw-black"
+            >
+              <i class="fa-solid fa-spinner fa-spin me-1"></i>
+              Checking extension...
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
+
+
+      <div class="small text-muted">
+        <i class="fa-solid fa-circle-info me-1"></i>
+        The extension is checked automatically when this dashboard loads.
+      </div>
+
+
       <hr class="my-4">
+
+
       <div class="meta-line">
-        <span class="meta-pill"><i class="fa-solid fa-hourglass-half"></i>Expires after <%= t.expiryHours %> hours</span>
+
+        <span class="meta-pill">
+          <i class="fa-solid fa-shield"></i>
+          Secure Connection
+        </span>
+
       </div>
+
     </div>
   </div>
+
+
+
+  <!-- USER TOOLS -->
+  <% tools.forEach((t,i)=>{ %>
+
+  <div class="col-xl-4 col-md-6">
+
+    <div class="card tool-card p-4 h-100">
+
+      <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+
+        <div class="d-flex align-items-center gap-3">
+
+          <div class="icon-bubble">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </div>
+
+          <div>
+
+            <h4 class="card-title fw-black mb-1">
+              <%= t.name %>
+            </h4>
+
+            <span class="badge badge-soft">
+              <i class="fa-regular fa-clock me-1"></i>
+              <%= t.expiryHours %>h expiry
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <p class="text-muted">
+        <%= t.description || 'No description added yet.' %>
+      </p>
+
+
+      <div
+        class="copy-box small d-none"
+        id="inst<%= i %>"
+      >
+        <%= t.instructions || t.accessNotes || '' %>
+      </div>
+
+
+      <div class="d-grid gap-2 mt-auto">
+
+        <button
+          class="btn btn-outline-secondary"
+          type="button"
+          onclick="copyText('inst<%= i %>')"
+        >
+          <i class="fa-solid fa-copy me-2"></i>
+          Copy Access Text
+        </button>
+
+
+        <% if (t.extensionFile) { %>
+
+        <a
+          class="btn btn-outline-dark"
+          href="/uploads/<%= t.extensionFile %>"
+          download
+        >
+          <i class="fa-solid fa-file-arrow-down me-2"></i>
+          Download Tool Extension
+        </a>
+
+        <% } %>
+
+
+        <a
+          class="btn btn-primary<%= (t.url || '').includes('labs.google') ? ' secure-tool-launch' : '' %>"
+          href="<%= t.url %>"
+          target="_blank"
+          data-tool-id="<%= t.id %>"
+          data-secure-tool="<%= (t.url || '').includes('labs.google') ? '1' : '0' %>"
+        >
+          <i class="fa-solid fa-arrow-up-right-from-square me-2"></i>
+          Open Tool
+        </a>
+
+      </div>
+
+
+      <hr class="my-4">
+
+
+      <div class="meta-line">
+
+        <span class="meta-pill">
+          <i class="fa-solid fa-hourglass-half"></i>
+          Expires after <%= t.expiryHours %> hours
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
   <% }) %>
+
+
+
   <% if (!tools.length) { %>
-  <div class="col-12">
+
+  <div class="col-xl-8 col-md-6">
+
     <div class="card empty-state">
+
       <i class="fa-solid fa-toolbox"></i>
-      <h3 class="fw-black">No tools available</h3>
-      <p class="text-muted mb-0">Ask admin to add tools for your account.</p>
+
+      <h3 class="fw-black">
+        No tools available
+      </h3>
+
+      <p class="text-muted mb-0">
+        Ask admin to add tools for your account.
+      </p>
+
     </div>
+
   </div>
+
   <% } %>
+
 </div>
